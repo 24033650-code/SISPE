@@ -1,109 +1,449 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-<meta charset="UTF-8">
-<title>Registro de la persona Usuaria</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISPE UPB - Prototipo Funcional</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
-<link rel="stylesheet" href="estilos.css">
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 180, 204, 0.3); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 180, 204, 0.6); }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+        .active-tab {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-right: 4px solid #00B4CC;
+            color: #00B4CC;
+        }
 
-<script src="https://kit.fontawesome.com/4adad3e7d4.js" crossorigin="anonymous"></script>
-
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-900 overflow-hidden">
 
-<body>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 bg-[#002B49] z-50 flex items-center justify-center fade-in">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-[#00B4CC] rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        </div>
 
-<div class="form-container">
+        <div class="bg-white p-10 rounded-[2rem] shadow-2xl w-full max-w-md relative z-10 mx-4">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-[#002B49] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform rotate-3">
+                    <span class="text-white font-black text-3xl">U</span>
+                </div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">SISPE UPB</h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Plataforma Institucional</p>
+            </div>
 
-<h2>Registro de la persona Usuaria</h2>
+            <form onsubmit="event.preventDefault();" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Matrícula o Correo</label>
+                    <input type="text" placeholder="ej. 20230001@upb.edu.mx" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-[#00B4CC] focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-wide mb-1">Contraseña</label>
+                    <input type="password" placeholder="••••••••" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-[#00B4CC] focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all">
+                </div>
+                
+                <div class="pt-4 border-t border-slate-100 mt-6">
+                    <p class="text-center text-[10px] font-bold text-slate-400 uppercase mb-3">Modo Prototipo - Selecciona un rol para entrar</p>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="login('student')" class="w-full py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black uppercase hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="user" class="w-4 h-4"></i> Entrar como Alumno
+                        </button>
+                        <button onclick="login('professor')" class="w-full py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i> Entrar como Docente
+                        </button>
+                        <button onclick="login('admin')" class="w-full py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-black uppercase hover:bg-rose-100 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="shield" class="w-4 h-4"></i> Entrar como Admin
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<form>
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="app" class="hidden flex h-screen w-full">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-[#002B49] text-white flex flex-col shadow-xl z-20">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <span class="text-[#002B49] font-black text-xl">U</span>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-black tracking-tight leading-none uppercase">SISPE</h1>
+                        <p class="text-[9px] text-white/50 font-bold uppercase tracking-[0.1em] mt-1">U. Politécnica Bicentenario</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav id="nav-menu" class="flex-1 overflow-y-auto py-4 custom-scrollbar">
+                <!-- Se inyecta vía JS -->
+            </nav>
 
-<div class="input-group">
+            <div class="p-4 border-t border-white/10 bg-[#001D33]">
+                <div class="flex items-center space-x-3 mb-4 px-2">
+                    <div id="user-avatar" class="w-9 h-9 rounded-full bg-[#00B4CC] flex items-center justify-center font-bold text-white shadow-lg uppercase">
+                        A
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs font-bold truncate" id="user-name">Usuario</p>
+                        <p class="text-[9px] text-white/50 uppercase" id="user-role-label">Rol</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center space-x-2 text-white/40 hover:text-rose-400 transition-colors px-2 py-2 rounded-lg">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
 
-<label>Nombre</label>
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 bg-slate-50/50">
+            <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <h2 id="current-tab-title" class="text-xl font-black text-slate-800 tracking-tight">Cargando...</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleTestRole()" class="text-[10px] font-black uppercase bg-slate-100 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Cambiar Rol (Test)
+                    </button>
+                    <button class="p-2 text-slate-400 hover:text-[#00B4CC] bg-white rounded-xl shadow-sm border border-slate-100 relative transition-all hover:shadow-md">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full border-2 border-white text-[8px] text-white flex items-center justify-center font-black">2</span>
+                    </button>
+                </div>
+            </header>
 
-<div class="input-box">
-<i class="fa-solid fa-user"></i>
-<input type="text" placeholder="Tu nombre">
-</div>
+            <div id="content-area" class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <!-- Se inyecta vía JS -->
+            </div>
+        </main>
+    </div>
 
-</div>
+    <script>
+        // --- 1. CONFIGURACIÓN Y DATOS SIMULADOS ---
+        const MENUS = {
+            student: [
+                { id: 'dashboard', label: "Tablero", icon: 'layout-dashboard' },
+                { id: 'register', label: "Registrar Proyecto", icon: 'file-plus' },
+                { id: 'my-projects', label: "Mis Proyectos", icon: 'folder-kanban' },
+                { id: 'progress', label: "Subir Avances", icon: 'upload-cloud' }
+            ],
+            professor: [
+                { id: 'dashboard', label: "Vista General", icon: 'layout-dashboard' },
+                { id: 'proposals', label: "Revisar Propuestas", icon: 'file-check' },
+                { id: 'advised', label: "Asesorados", icon: 'users' },
+                { id: 'meetings', label: "Citas Académicas", icon: 'calendar' }
+            ],
+            admin: [
+                { id: 'dashboard', label: "Indicadores", icon: 'pie-chart' },
+                { id: 'users', label: "Gestión de Usuarios", icon: 'users' },
+                { id: 'reports', label: "Reportes Globales", icon: 'file-text' }
+            ]
+        };
 
+        const PROYECTOS_MOCK = [
+            { id: 1, title: 'Optimización de Redes', student: 'Ana García', status: 'En Desarrollo', progress: 65, date: '12 Oct 2024' },
+            { id: 2, title: 'App de Alfabetización', student: 'Marc Torres', status: 'Revisión', progress: 15, date: '15 Oct 2024' },
+            { id: 3, title: 'IA Reforestación Urbana', student: 'Lucía Ríos', status: 'Aprobado', progress: 100, date: '01 Nov 2024' },
+            { id: 4, title: 'Análisis de Datos Médicos', student: 'Sofía Paz', status: 'Riesgo', progress: 5, date: '20 Nov 2024' }
+        ];
 
-<div class="input-group">
+        let currentRole = null;
+        let currentTab = null;
 
-<label>Apellido</label>
+        // --- 2. FUNCIONES DE AUTENTICACIÓN ---
+        function login(role) {
+            currentRole = role;
+            currentTab = 'dashboard';
+            
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            
+            updateUI();
+        }
 
-<div class="input-box">
-<i class="fa-solid fa-id-card"></i>
-<input type="text" placeholder="Tu apellido">
-</div>
+        function logout() {
+            currentRole = null;
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
 
-</div>
+        function toggleTestRole() {
+            const roles = ['student', 'professor', 'admin'];
+            let nextIndex = (roles.indexOf(currentRole) + 1) % roles.length;
+            login(roles[nextIndex]);
+        }
 
+        // --- 3. RENDERIZADORES COMPARTIDOS Y AYUDANTES ---
+        function renderMenu() {
+            const nav = document.getElementById('nav-menu');
+            nav.innerHTML = `<p class="px-6 text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Menú Principal</p>`;
+            
+            MENUS[currentRole].forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center px-6 py-3 space-x-3 transition-all duration-200 ${currentTab === item.id ? 'active-tab' : 'text-white/60 hover:bg-white/5 hover:text-white'}`;
+                btn.innerHTML = `<i data-lucide="${item.icon}" class="w-4 h-4"></i><span class="font-semibold text-sm">${item.label}</span>`;
+                btn.onclick = () => { currentTab = item.id; updateUI(); };
+                nav.appendChild(btn);
+            });
+        }
 
-<div class="input-group">
+        function statCard(title, value, icon, colorClass) {
+            return `
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-[#00B4CC] transition-all">
+                    <div>
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">${title}</p>
+                        <h4 class="text-3xl font-black text-slate-800">${value}</h4>
+                    </div>
+                    <div class="p-4 rounded-2xl ${colorClass}">
+                        <i data-lucide="${icon}" class="w-6 h-6"></i>
+                    </div>
+                </div>`;
+        }
 
-<label>Correo Electrónico</label>
+        // --- 4. VISTAS DEL ALUMNO ---
+        const VISTAS_ALUMNO = {
+            'dashboard': () => `
+                <div class="fade-in space-y-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-[#002B49]">Hola, Ricardo 👋</h3>
+                        <p class="text-slate-500 font-medium">Aquí está el resumen de tu proceso de titulación.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${statCard("Proyectos Activos", 1, "folder", "bg-indigo-50 text-indigo-600")}
+                        ${statCard("Avance Global", "65%", "trending-up", "bg-emerald-50 text-emerald-600")}
+                        ${statCard("Próxima Cita", "12 Nov", "calendar", "bg-amber-50 text-amber-600")}
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-black text-slate-800 mb-4 uppercase text-xs tracking-widest">Avisos Recientes</h4>
+                        <div class="p-4 bg-blue-50 text-blue-800 rounded-2xl text-sm font-medium border border-blue-100 flex gap-3">
+                            <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+                            <p>Recuerda que la fecha límite para subir el capítulo 2 es el <strong>15 de Noviembre</strong>.</p>
+                        </div>
+                    </div>
+                </div>`,
+            'register': () => `
+                <div class="fade-in max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-[#002B49] p-6 text-white"><h3 class="text-xl font-black">Nuevo Proyecto</h3></div>
+                    <div class="p-8 space-y-6">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase mb-2">Título del Proyecto</label>
+                            <input type="text" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#00B4CC]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase mb-2">Planteamiento del Problema</label>
+                            <textarea class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl h-32 outline-none focus:border-[#00B4CC]"></textarea>
+                        </div>
+                        <button class="w-full py-3 bg-[#00B4CC] text-white rounded-xl font-black uppercase tracking-widest hover:bg-[#0092a6] transition-colors">Enviar Propuesta</button>
+                    </div>
+                </div>`,
+            'my-projects': () => `
+                <div class="fade-in space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col md:flex-row gap-6 items-center">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0">
+                            <i data-lucide="cpu" class="w-10 h-10"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase">En Desarrollo</span>
+                            <h3 class="text-xl font-black text-slate-800 mt-2">Optimización de Redes Inteligentes</h3>
+                            <p class="text-sm text-slate-500">Asesor: Dr. Fernando López</p>
+                        </div>
+                        <div class="w-full md:w-48 text-right">
+                            <p class="text-3xl font-black text-[#00B4CC]">65%</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Progreso Total</p>
+                        </div>
+                    </div>
+                </div>`,
+            'progress': () => `
+                <div class="fade-in grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-black mb-4">Subir Nuevo Avance</h4>
+                        <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
+                            <i data-lucide="upload-cloud" class="w-10 h-10 text-slate-400 mx-auto mb-2"></i>
+                            <p class="text-sm font-bold text-slate-600">Arrastra tu PDF aquí</p>
+                            <p class="text-xs text-slate-400">Máximo 10MB</p>
+                        </div>
+                        <button class="w-full mt-4 py-3 bg-[#002B49] text-white rounded-xl font-black uppercase text-xs">Guardar Avance</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-black mb-4">Historial de Entregas</h4>
+                        <div class="space-y-3">
+                            <div class="p-3 border rounded-xl flex items-center justify-between bg-slate-50">
+                                <div><p class="text-sm font-bold">Capítulo 1.pdf</p><p class="text-xs text-emerald-600 font-bold">Aprobado</p></div>
+                                <i data-lucide="check-circle" class="text-emerald-500"></i>
+                            </div>
+                            <div class="p-3 border rounded-xl flex items-center justify-between bg-slate-50">
+                                <div><p class="text-sm font-bold">Capítulo 2_borrador.pdf</p><p class="text-xs text-amber-600 font-bold">Con Correcciones</p></div>
+                                <i data-lucide="alert-circle" class="text-amber-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>`
+        };
 
-<div class="input-box">
-<i class="fa-solid fa-envelope"></i>
-<input type="email" placeholder="correo@email.com">
-</div>
+        // --- 5. VISTAS DEL DOCENTE ---
+        const VISTAS_DOCENTE = {
+            'dashboard': () => `
+                <div class="fade-in space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        ${statCard("Asesorados", 8, "users", "bg-blue-50 text-blue-600")}
+                        ${statCard("Propuestas", 3, "file-question", "bg-amber-50 text-amber-600")}
+                        ${statCard("Por Evaluar", 5, "clock", "bg-rose-50 text-rose-600")}
+                        ${statCard("Citas Hoy", 2, "calendar", "bg-emerald-50 text-emerald-600")}
+                    </div>
+                </div>`,
+            'proposals': () => `
+                <div class="fade-in bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-400 font-black">
+                            <tr><th class="p-4">Alumno</th><th class="p-4">Título Propuesto</th><th class="p-4">Acciones</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${PROYECTOS_MOCK.filter(p=>p.status==='Revisión').map(p => `
+                                <tr>
+                                    <td class="p-4 font-bold text-sm">${p.student}</td>
+                                    <td class="p-4 text-sm text-slate-600">${p.title}</td>
+                                    <td class="p-4 flex gap-2">
+                                        <button class="p-2 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                        <button class="p-2 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`,
+            'advised': () => `
+                <div class="fade-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${PROYECTOS_MOCK.map(p => `
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-slate-400">${p.student.charAt(0)}</div>
+                                <div><p class="font-bold text-sm">${p.student}</p><p class="text-[10px] text-slate-400 uppercase">${p.status}</p></div>
+                            </div>
+                            <p class="text-sm text-slate-700 font-medium mb-4 line-clamp-2">${p.title}</p>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div class="bg-[#00B4CC] h-full" style="width:${p.progress}%"></div></div>
+                        </div>
+                    `).join('')}
+                </div>`,
+            'meetings': () => `
+                <div class="fade-in bg-white p-6 rounded-3xl border border-slate-200">
+                    <h4 class="font-black mb-6">Próximas Sesiones de Asesoría</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border">
+                            <div class="flex items-center gap-4">
+                                <div class="p-3 bg-white rounded-xl shadow-sm text-center min-w-[60px]">
+                                    <p class="text-xs text-slate-400 uppercase font-black">Nov</p><p class="text-xl font-black text-[#002B49]">12</p>
+                                </div>
+                                <div><p class="font-bold">Revisión Capítulo 3</p><p class="text-sm text-slate-500">Ana García • 10:00 AM</p></div>
+                            </div>
+                            <button class="px-4 py-2 text-xs font-black uppercase text-indigo-600 bg-indigo-50 rounded-xl">Unirse a Meet</button>
+                        </div>
+                    </div>
+                </div>`
+        };
 
-</div>
+        // --- 6. VISTAS DEL ADMINISTRADOR ---
+        const VISTAS_ADMIN = {
+            'dashboard': () => `
+                <div class="fade-in space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        ${statCard("Alumnos Totales", 1240, "users", "bg-blue-50 text-blue-600")}
+                        ${statCard("Docentes", 85, "briefcase", "bg-indigo-50 text-indigo-600")}
+                        ${statCard("Eficiencia", "82%", "pie-chart", "bg-emerald-50 text-emerald-600")}
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 h-64 flex items-center justify-center">
+                        <p class="text-slate-400 font-bold"><i data-lucide="bar-chart-2" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>Gráfico de Titulaciones por Cuatrimestre</p>
+                    </div>
+                </div>`,
+            'users': () => `
+                <div class="fade-in bg-white rounded-3xl border border-slate-200 p-6">
+                    <div class="flex justify-between mb-6">
+                        <h4 class="font-black">Directorio Activo</h4>
+                        <button class="px-4 py-2 bg-[#002B49] text-white text-xs font-black uppercase rounded-lg">+ Nuevo Usuario</button>
+                    </div>
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-400 font-black">
+                            <tr><th>Nombre</th><th>Rol</th><th>Estatus</th><th>Acción</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr><td class="py-3 font-bold">Ricardo Alumno</td><td class="py-3 text-sm">Estudiante</td><td class="py-3"><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Activo</span></td><td class="py-3"><button class="text-blue-500 text-sm">Editar</button></td></tr>
+                            <tr><td class="py-3 font-bold">Dr. López</td><td class="py-3 text-sm">Profesor</td><td class="py-3"><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Activo</span></td><td class="py-3"><button class="text-blue-500 text-sm">Editar</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>`,
+            'reports': () => `
+                <div class="fade-in bg-white p-6 rounded-3xl border border-slate-200">
+                    <h4 class="font-black mb-6">Generación de Reportes</h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-6 border rounded-2xl flex items-center gap-4 hover:border-emerald-500 cursor-pointer transition-colors group">
+                            <i data-lucide="file-spreadsheet" class="w-8 h-8 text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                            <div><p class="font-bold">Reporte de Estatus de Proyectos</p><p class="text-xs text-slate-500">Exportar a Excel (.xlsx)</p></div>
+                        </div>
+                        <div class="p-6 border rounded-2xl flex items-center gap-4 hover:border-rose-500 cursor-pointer transition-colors group">
+                            <i data-lucide="file-text" class="w-8 h-8 text-rose-500 group-hover:scale-110 transition-transform"></i>
+                            <div><p class="font-bold">Acta Global de Titulación</p><p class="text-xs text-slate-500">Exportar a PDF (.pdf)</p></div>
+                        </div>
+                    </div>
+                </div>`
+        };
 
+        // --- 7. CONTROLADOR PRINCIPAL ---
+        function updateUI() {
+            if (!currentRole) return;
 
-<div class="input-group">
+            // Info de Usuario Superior
+            const names = { student: 'Ricardo Alumno', professor: 'Dr. López', admin: 'Admin UPB' };
+            const labels = { student: 'Portal Estudiante', professor: 'Portal Docente', admin: 'Administración' };
+            
+            document.getElementById('user-name').innerText = names[currentRole];
+            document.getElementById('user-role-label').innerText = labels[currentRole];
+            document.getElementById('user-avatar').innerText = currentRole.charAt(0).toUpperCase();
 
-<label>Contraseña</label>
+            // Titulo de Tab
+            const currentItem = MENUS[currentRole].find(i => i.id === currentTab);
+            document.getElementById('current-tab-title').innerText = currentItem ? currentItem.label : 'SISPE';
 
-<div class="input-box">
-<i class="fa-solid fa-lock"></i>
-<input type="password">
-</div>
+            renderMenu();
 
-</div>
+            // Renderizar Contenido según Rol y Tab
+            const container = document.getElementById('content-area');
+            let htmlContent = '';
 
+            if (currentRole === 'student' && VISTAS_ALUMNO[currentTab]) htmlContent = VISTAS_ALUMNO[currentTab]();
+            else if (currentRole === 'professor' && VISTAS_DOCENTE[currentTab]) htmlContent = VISTAS_DOCENTE[currentTab]();
+            else if (currentRole === 'admin' && VISTAS_ADMIN[currentTab]) htmlContent = VISTAS_ADMIN[currentTab]();
+            else htmlContent = `<div class="p-10 text-center text-slate-400 font-bold">Módulo en construcción</div>`;
 
-<div class="input-group">
+            container.innerHTML = htmlContent;
+            lucide.createIcons(); // Recargar iconos después de inyectar HTML
+        }
 
-<label>Sobre ti</label>
+        // Inicializar Iconos en el Login
+        window.onload = () => {
+            lucide.createIcons();
+        };
 
-<textarea rows="3" placeholder="Cuéntanos un poco sobre ti"></textarea>
-
-</div>
-
-
-<p class="intereses">Intereses</p>
-
-<div class="checkbox-group">
-
-<label class="checkbox">
-<input type="checkbox">
-<span>Tecnología</span>
-</label>
-
-<label class="checkbox">
-<input type="checkbox">
-<span>Arte</span>
-</label>
-
-<label class="checkbox">
-<input type="checkbox">
-<span>Deporte</span>
-</label>
-
-</div>
-
-<button class="btn">Registrarse</button>
-
-</form>
-
-</div>
-
+    </script>
 </body>
 </html>
