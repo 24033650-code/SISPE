@@ -1,314 +1,359 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  LayoutDashboard, FilePlus, FolderKanban, MessageSquare, Calendar, Users, 
-  TrendingUp, AlertCircle, CheckCircle2, Clock, Search, ChevronRight, 
-  LogOut, Bell, BookOpen, PieChart, Sparkles, Loader2, FileText, 
-  User, Briefcase, Mail, Send, Filter, ExternalLink, Save, Plus,
-  Database, ShieldCheck, GraduationCap, Vote, MessageCircle, Award, Megaphone
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGE - Portal Integral UPB</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-// ==========================================
-// 1. CONFIGURACIÓN GLOBAL Y ROLES
-// ==========================================
-const ROLES = {
-  ESTUDIANTE: 'estudiante',
-  PROFESOR: 'profesor',
-  ADMIN: 'admin'
-};
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Animaciones Personalizadas */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-// Nuevo menú ampliado considerando la escalabilidad
-const SECCIONES = {
-  estudiante: [
-    { id: 'dashboard', label: "Mi Tablero", icon: LayoutDashboard },
-    { id: 'proyectos', label: "Mis Proyectos", icon: FolderKanban },
-    { id: 'calificaciones', label: "Calificaciones", icon: Award },
-    { id: 'quejas', label: "Quejas y Sugerencias", icon: MessageCircle },
-    { id: 'elecciones', label: "República Escolar", icon: Vote },
-  ],
-  profesor: [
-    { id: 'dashboard', label: "Dashboard", icon: LayoutDashboard },
-    { id: 'proyectos', label: "Gestión de Proyectos", icon: BookOpen },
-    { id: 'calificaciones', label: "Subir Calificaciones", icon: Award },
-    { id: 'quejas', label: "Buzón Estudiantil", icon: MessageSquare },
-  ],
-  admin: [
-    { id: 'dashboard', label: "Métricas", icon: PieChart },
-    { id: 'usuarios', label: "Usuarios", icon: Users },
-    { id: 'elecciones', label: "Gestión Electoral", icon: Megaphone },
-    { id: 'reportes', label: "Reportes Generales", icon: FileText },
-  ]
-};
+        /* Ocultar scrollbar para un diseño más limpio */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="flex h-screen bg-slate-50 text-slate-800 overflow-hidden">
 
-// ==========================================
-// 2. MÓDULOS DE LA APLICACIÓN (Vistas separadas)
-// ==========================================
-
-// --- Módulo: Proyectos ---
-const ModuloProyectos = ({ role }) => (
-  <div className="space-y-6 animate-in fade-in duration-500">
-    {/* Seccion "Registrar proyecto" */}
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm mb-6">
-      <h2 id="registrar-proyecto-title" className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-        <FilePlus className="text-[#00B4CC]" />
-        Registrar Nuevo Proyecto
-      </h2>
-      <p className="text-slate-500 text-sm mt-2">Llena los datos para registrar un nuevo proyecto o protocolo.</p>
-      {/* Aquí irá tu formulario de registro */}
-      <div className="mt-4 p-8 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400">
-        Área del formulario de registro...
-      </div>
-    </div>
-
-    {/* Seccion "Mis Proyectos" */}
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-      <h2 id="mis-proyectos-title" className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-        <FolderKanban className="text-[#00B4CC]" />
-        Proyectos Activos
-      </h2>
-      {/* Aquí irá tu tabla o tarjetas de proyectos */}
-      <div className="mt-4 p-8 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400">
-        Lista y tabla de proyectos en curso...
-      </div>
-    </div>
-  </div>
-);
-
-// --- Módulo: Quejas y Sugerencias ---
-const ModuloQuejas = () => (
-  <div className="space-y-6 animate-in fade-in duration-500">
-    {/* Seccion "Nueva Queja/Sugerencia" */}
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-      <h2 id="nueva-queja-title" className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-        <MessageCircle className="text-amber-500" />
-        Buzón de Atención
-      </h2>
-      <p className="text-slate-500 text-sm mt-2">Tu opinión es importante. Selecciona si deseas enviar una queja, sugerencia o felicitación.</p>
-      <div className="mt-4 p-8 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400">
-        Formulario de buzón (Anónimo o Público)...
-      </div>
-    </div>
-  </div>
-);
-
-// --- Módulo: Elecciones / República Escolar ---
-const ModuloElecciones = () => (
-  <div className="space-y-6 animate-in fade-in duration-500">
-    {/* Seccion "Votaciones Activas" */}
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-      <h2 id="elecciones-title" className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-        <Vote className="text-indigo-500" />
-        Elecciones de República Escolar
-      </h2>
-      <p className="text-slate-500 text-sm mt-2">Ejerce tu voto para elegir a tus representantes.</p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-8 border-2 border-slate-100 bg-slate-50 rounded-xl text-center">
-           <h3 className="font-bold text-slate-800">Planilla Azul</h3>
-           <button className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold">Votar por esta planilla</button>
-        </div>
-        <div className="p-8 border-2 border-slate-100 bg-slate-50 rounded-xl text-center">
-           <h3 className="font-bold text-slate-800">Planilla Naranja</h3>
-           <button className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-bold">Votar por esta planilla</button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-// --- Módulo: Calificaciones ---
-const ModuloCalificaciones = () => (
-  <div className="space-y-6 animate-in fade-in duration-500">
-    {/* Seccion "Kardex / Calificaciones" */}
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-      <h2 id="calificaciones-title" className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-        <Award className="text-emerald-500" />
-        Portal de Calificaciones
-      </h2>
-      <p className="text-slate-500 text-sm mt-2">Consulta tu progreso académico e historial de materias.</p>
-      <div className="mt-4 p-8 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400">
-        Tabla de materias y promedios...
-      </div>
-    </div>
-  </div>
-);
-
-// ==========================================
-// 3. COMPONENTE PRINCIPAL (APP)
-// ==========================================
-const App = () => {
-  const [role, setRole] = useState(ROLES.ESTUDIANTE);
-  const [activeTab, setActiveTab] = useState('dashboard');
-  
-  const currentMenu = useMemo(() => SECCIONES[role] || [], [role]);
-
-  // --- Módulo: Dashboard Home (El que ya tenías, ligeramente adaptado) ---
-  const DashboardHome = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          {/* NUEVO NOMBRE APLICADO AQUÍ */}
-          <h2 className="text-3xl font-black text-[#002B49]">Portal SIGE - UPB</h2>
-          <p className="text-slate-500 font-medium italic">"Saber ser, saber hacer"</p>
-        </div>
-        <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
-          <div className="w-10 h-10 bg-[#00B4CC] rounded-xl flex items-center justify-center text-white font-bold">
-            {role.charAt(0).toUpperCase()}
-          </div>
-          <div className="pr-4">
-            <p className="text-[10px] font-black text-slate-400 uppercase leading-none">Rol de Acceso</p>
-            <p className="text-sm font-bold text-slate-800 capitalize">{role}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Widgets del Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#002B49] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group">
-          <div className="relative z-10">
-            <p className="text-xs font-bold text-[#00B4CC] uppercase tracking-widest mb-2">Proyectos Activos</p>
-            <h3 className="text-5xl font-black tracking-tighter">124</h3>
-          </div>
-          <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-            <GraduationCap size={120} />
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Notificaciones</p>
-          <h3 className="text-5xl font-black text-slate-800 tracking-tighter">03</h3>
-          <p className="text-xs font-bold text-amber-500 mt-2">Mensajes sin leer</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Promedio Gral.</p>
-          <h3 className="text-5xl font-black text-slate-800 tracking-tighter">9.2</h3>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ==========================================
-  // ENRUTADOR PRINCIPAL (Renderizado dinámico)
-  // ==========================================
-  const renderContenido = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardHome />;
-      case 'proyectos':
-        return <ModuloProyectos role={role} />;
-      case 'quejas':
-        return <ModuloQuejas />;
-      case 'elecciones':
-        return <ModuloElecciones />;
-      case 'calificaciones':
-        return <ModuloCalificaciones />;
-      default:
-        // Pantalla genérica para módulos en desarrollo (Reportes, Usuarios, etc.)
-        return (
-          <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
-            <div className="p-8 bg-slate-50 rounded-full mb-6">
-              <Database className="text-slate-200" size={64} />
+    <aside class="w-72 bg-[#002B49] text-white flex flex-col shadow-2xl z-50">
+        <div class="p-8">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 transition-transform hover:rotate-6">
+                    <span class="text-[#002B49] font-black text-2xl">UPB</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter leading-none">SIGE</h1>
+                    <span class="text-[10px] font-bold text-[#00B4CC] uppercase tracking-widest">Portal Integral</span>
+                </div>
             </div>
-            <h3 className="text-2xl font-black text-slate-300 uppercase tracking-tighter">Módulo en Desarrollo</h3>
-            <p className="text-slate-400 font-medium">Esta sección se está programando...</p>
-          </div>
-        );
-    }
-  };
-
-  return (
-    <div className="flex h-screen bg-slate-50 font-sans">
-      {/* Barra Lateral */}
-      <aside className="w-72 bg-[#002B49] text-white flex flex-col shadow-2xl z-50">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
-              <span className="text-[#002B49] font-black text-2xl">UPB</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-black tracking-tighter leading-none">SIGE</h1>
-              <span className="text-[10px] font-bold text-[#00B4CC] uppercase tracking-widest">Portal Integral</span>
-            </div>
-          </div>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          <p className="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">Navegación</p>
-          {currentMenu.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 ${
-                activeTab === item.id 
-                ? 'bg-white/10 text-[#00B4CC] shadow-inner' 
-                : 'text-white/60 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <item.icon size={20} />
-              <span className="font-bold text-sm tracking-tight">{item.label}</span>
-              {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-[#00B4CC] rounded-full shadow-[0_0_8px_#00B4CC]"></div>}
-            </button>
-          ))}
-        </nav>
+        <nav id="menu-container" class="flex-1 px-4 space-y-2 overflow-y-auto">
+            </nav>
 
-        {/* Simulador de Roles */}
-        <div className="p-6 mt-auto border-t border-white/10 bg-black/20">
-          <label className="block text-[9px] font-black text-white/40 uppercase mb-3 ml-2">Simular Portal</label>
-          <div className="grid grid-cols-3 gap-2">
-            {Object.values(ROLES).map(r => (
-              <button 
-                key={r}
-                onClick={() => { setRole(r); setActiveTab('dashboard'); }}
-                className={`py-2 text-[8px] font-black rounded-lg border uppercase transition-all ${
-                  role === r ? 'border-[#00B4CC] text-[#00B4CC] bg-[#00B4CC]/10' : 'border-white/10 text-white/40 hover:bg-white/5'
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
+        <div class="p-6 mt-auto border-t border-white/10 bg-black/20">
+            <label class="block text-[9px] font-black text-white/40 uppercase mb-3 ml-2">Simular Portal</label>
+            <div class="grid grid-cols-3 gap-2" id="role-buttons">
+                </div>
         </div>
-      </aside>
+    </aside>
 
-      {/* Area Principal */}
-      <main className="flex-1 overflow-y-auto flex flex-col">
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 flex items-center justify-between sticky top-0 z-40">
-          {/* Header contenido (Buscador y Perfil)... */}
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-[#00B4CC] transition-colors" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar por matrícula o módulo..."
-              className="bg-slate-100 border-none rounded-2xl pl-12 pr-6 py-3 text-sm font-medium w-80 focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all"
-            />
-          </div>
-
-          <div className="flex items-center gap-6">
-            <button className="relative p-2 text-slate-400 hover:text-[#002B49] transition-colors">
-              <Bell size={24} />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="h-8 w-px bg-slate-200"></div>
-            <div className="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-all">
-              <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-slate-800 leading-none">Usuario Demo</p>
-                <p className="text-[10px] font-bold text-slate-400 capitalize">{role}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
-                <img src={`https://ui-avatars.com/api/?name=${role}&background=002B49&color=fff`} alt="Perfil" />
-              </div>
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 flex items-center justify-between z-40 shrink-0 shadow-sm">
+            <div class="relative group">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-[#00B4CC] transition-colors w-4 h-4"></i>
+                <input type="text" placeholder="Buscar por matrícula o módulo..." class="bg-slate-100 border-none rounded-2xl pl-12 pr-6 py-3 text-sm font-medium w-80 focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all">
             </div>
-          </div>
+
+            <div class="flex items-center gap-6">
+                <button class="relative p-2 text-slate-400 hover:text-[#002B49] transition-colors hover:scale-110">
+                    <i data-lucide="bell"></i>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+                </button>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-all">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-black text-slate-800 leading-none">Usuario Activo</p>
+                        <p id="current-role-text" class="text-[10px] font-bold text-slate-400 capitalize">Estudiante</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                        <img id="profile-img" src="https://ui-avatars.com/api/?name=Estudiante&background=002B49&color=fff" alt="Perfil" />
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <div className="p-10 flex-1">
-          {/* AQUÍ SE RENDERIZA EL MÓDULO ACTIVO */}
-          {renderContenido()}
-        </div>
+        <div id="main-content" class="p-10 flex-1 overflow-y-auto bg-slate-50">
+            </div>
+    </main>
 
-        <footer className="p-6 text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">
-          Universidad Politécnica del Bicentenario • © 2026 SIGE
-        </footer>
-      </main>
-    </div>
-  );
-};
+    <script>
+        // ==========================================
+        // 1. CONFIGURACIÓN GLOBAL
+        // ==========================================
+        const ROLES = ['estudiante', 'profesor', 'admin'];
+        let currentRole = 'estudiante';
+        let currentTab = 'dashboard';
 
-export default App;
+        const SECCIONES = {
+            estudiante: [
+                { id: 'dashboard', label: "Mi Tablero", icon: "layout-dashboard" },
+                { id: 'proyectos', label: "Mis Proyectos", icon: "folder-kanban" },
+                { id: 'calificaciones', label: "Calificaciones", icon: "award" },
+                { id: 'quejas', label: "Quejas y Sugerencias", icon: "message-circle" },
+                { id: 'elecciones', label: "República Escolar", icon: "vote" },
+            ],
+            profesor: [
+                { id: 'dashboard', label: "Dashboard", icon: "layout-dashboard" },
+                { id: 'proyectos', label: "Gestión de Proyectos", icon: "book-open" },
+                { id: 'calificaciones', label: "Subir Calificaciones", icon: "award" },
+                { id: 'quejas', label: "Buzón Estudiantil", icon: "message-square" },
+            ],
+            admin: [
+                { id: 'dashboard', label: "Métricas", icon: "pie-chart" },
+                { id: 'usuarios', label: "Usuarios", icon: "users" },
+                { id: 'elecciones', label: "Gestión Electoral", icon: "megaphone" },
+                { id: 'reportes', label: "Reportes Generales", icon: "file-text" },
+            ]
+        };
+
+        // ==========================================
+        // 2. MÓDULOS DE VISTAS (HTML como Strings)
+        // ==========================================
+
+        // --- Módulo: Dashboard ---
+        const getDashboardHTML = () => `
+            <div class="fade-in-up space-y-6">
+                <div class="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <div>
+                        <h2 class="text-3xl font-black text-[#002B49]">Portal SIGE - UPB</h2>
+                        <p class="text-slate-500 font-medium italic">"Saber ser, saber hacer"</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="w-12 h-12 bg-[#00B4CC] rounded-xl flex items-center justify-center text-white font-bold text-xl uppercase">
+                            ${currentRole.charAt(0)}
+                        </div>
+                        <div class="pr-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase leading-none">Rol de Acceso</p>
+                            <p class="text-sm font-bold text-slate-800 capitalize">${currentRole}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-[#002B49] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-[#00B4CC] uppercase tracking-widest mb-2">Proyectos Activos</p>
+                            <h3 class="text-5xl font-black tracking-tighter">124</h3>
+                        </div>
+                        <i data-lucide="graduation-cap" class="absolute -right-4 -bottom-4 opacity-10 w-32 h-32 group-hover:scale-110 transition-transform duration-500"></i>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Notificaciones</p>
+                        <h3 class="text-5xl font-black text-slate-800 tracking-tighter">03</h3>
+                        <p class="text-xs font-bold text-amber-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Mensajes sin leer</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-emerald-300 transition-colors">
+                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Promedio Gral.</p>
+                        <h3 class="text-5xl font-black text-slate-800 tracking-tighter">9.2</h3>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // --- Módulo: Proyectos ---
+        const getProyectosHTML = () => `
+            <div class="fade-in-up space-y-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="file-plus" class="text-[#00B4CC]"></i> Registrar Nuevo Proyecto
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-2">Llena los datos para registrar un nuevo proyecto o protocolo.</p>
+                    <div class="mt-4 p-8 border-2 border-dashed border-slate-200 hover:border-[#00B4CC] transition-colors rounded-xl text-center text-slate-400 cursor-pointer">
+                        <i data-lucide="plus" class="mx-auto mb-2 opacity-50"></i>
+                        Clic aquí para abrir formulario de registro
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="folder-kanban" class="text-[#00B4CC]"></i> Mis Proyectos Activos
+                    </h2>
+                    <div class="mt-4 bg-slate-50 rounded-xl p-4 flex items-center justify-between border border-slate-100">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-[#00B4CC]/10 p-3 rounded-lg text-[#00B4CC]"><i data-lucide="book"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Sistema Control Inventarios</h4>
+                                <p class="text-xs text-slate-500">Ingeniería Industrial</p>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black uppercase">En Progreso</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // --- Módulo: Quejas ---
+        const getQuejasHTML = () => `
+            <div class="fade-in-up space-y-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="message-circle" class="text-amber-500"></i> Buzón de Atención
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-2">Selecciona si deseas enviar una queja, sugerencia o felicitación.</p>
+                    <div class="mt-6 flex flex-col gap-4 max-w-2xl">
+                        <select class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:border-amber-400">
+                            <option>Tipo de mensaje...</option>
+                            <option>Queja</option>
+                            <option>Sugerencia</option>
+                        </select>
+                        <textarea rows="4" class="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:border-amber-400 resize-none" placeholder="Escribe aquí tu mensaje..."></textarea>
+                        <button class="bg-amber-500 text-white font-bold py-3 px-6 rounded-xl self-start hover:bg-amber-600 transition-colors shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                            Enviar Mensaje
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // --- Módulo: Elecciones ---
+        const getEleccionesHTML = () => `
+            <div class="fade-in-up space-y-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="vote" class="text-indigo-500"></i> Elecciones de República Escolar
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-2">Ejerce tu voto para elegir a tus representantes. Proceso seguro y anónimo.</p>
+                    
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-8 border-2 border-slate-100 hover:border-indigo-300 bg-slate-50 rounded-2xl text-center transition-all group">
+                            <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <i data-lucide="users" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="font-black text-xl text-slate-800">Planilla Azul</h3>
+                            <p class="text-xs text-slate-500 mt-2 mb-6">Presidente: Juan Pérez</p>
+                            <button class="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-md">Votar por Azul</button>
+                        </div>
+
+                        <div class="p-8 border-2 border-slate-100 hover:border-orange-300 bg-slate-50 rounded-2xl text-center transition-all group">
+                            <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <i data-lucide="users" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="font-black text-xl text-slate-800">Planilla Naranja</h3>
+                            <p class="text-xs text-slate-500 mt-2 mb-6">Presidenta: Ana Gómez</p>
+                            <button class="w-full py-3 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md">Votar por Naranja</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // --- Módulo: En Desarrollo (Genérico) ---
+        const getEnDesarrolloHTML = () => `
+            <div class="fade-in-up flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+                <div class="p-6 bg-slate-50 rounded-full mb-6">
+                    <i data-lucide="database" class="w-16 h-16 text-slate-300"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-400 uppercase tracking-tighter">Módulo en Desarrollo</h3>
+                <p class="text-slate-500 font-medium mt-2">Esta sección se está diseñando actualmente.</p>
+            </div>
+        `;
+
+        // ==========================================
+        // 3. CONTROLADOR DE LA INTERFAZ
+        // ==========================================
+
+        function renderMenu() {
+            const menuContainer = document.getElementById('menu-container');
+            const items = SECCIONES[currentRole];
+            
+            menuContainer.innerHTML = '<p class="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">Navegación</p>';
+            
+            items.forEach(item => {
+                const isActive = currentTab === item.id;
+                const activeClass = isActive ? 'bg-white/10 text-[#00B4CC] shadow-inner' : 'text-white/60 hover:bg-white/5 hover:text-white';
+                const dot = isActive ? '<div class="ml-auto w-1.5 h-1.5 bg-[#00B4CC] rounded-full shadow-[0_0_8px_#00B4CC]"></div>' : '';
+                
+                menuContainer.innerHTML += `
+                    <button onclick="changeTab('${item.id}')" class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 ${activeClass}">
+                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                        <span class="font-bold text-sm tracking-tight">${item.label}</span>
+                        ${dot}
+                    </button>
+                `;
+            });
+            
+            // Refrescar iconos en el menú
+            lucide.createIcons();
+        }
+
+        function renderRoleButtons() {
+            const container = document.getElementById('role-buttons');
+            container.innerHTML = '';
+            
+            ROLES.forEach(r => {
+                const isActive = currentRole === r;
+                const activeClass = isActive ? 'border-[#00B4CC] text-[#00B4CC] bg-[#00B4CC]/10' : 'border-white/10 text-white/40 hover:bg-white/5';
+                
+                container.innerHTML += `
+                    <button onclick="changeRole('${r}')" class="py-2 text-[8px] font-black rounded-lg border uppercase transition-all ${activeClass}">
+                        ${r}
+                    </button>
+                `;
+            });
+        }
+
+        function renderContent() {
+            const container = document.getElementById('main-content');
+            
+            // Switch principal de vistas
+            switch(currentTab) {
+                case 'dashboard': container.innerHTML = getDashboardHTML(); break;
+                case 'proyectos': container.innerHTML = getProyectosHTML(); break;
+                case 'quejas': container.innerHTML = getQuejasHTML(); break;
+                case 'elecciones': container.innerHTML = getEleccionesHTML(); break;
+                default: container.innerHTML = getEnDesarrolloHTML(); break;
+            }
+            
+            // Refrescar iconos en el contenido principal
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 4. FUNCIONES DE ACCIÓN
+        // ==========================================
+
+        function changeTab(tabId) {
+            currentTab = tabId;
+            renderMenu();
+            renderContent();
+        }
+
+        function changeRole(role) {
+            currentRole = role;
+            currentTab = 'dashboard'; // Resetear a dashboard al cambiar rol
+            
+            // Actualizar textos del header
+            document.getElementById('current-role-text').innerText = role;
+            document.getElementById('profile-img').src = `https://ui-avatars.com/api/?name=${role}&background=002B49&color=fff`;
+            
+            renderRoleButtons();
+            renderMenu();
+            renderContent();
+        }
+
+        // Inicializar la app
+        window.onload = () => {
+            renderRoleButtons();
+            renderMenu();
+            renderContent();
+        };
+
+    </script>
+</body>
+</html>
