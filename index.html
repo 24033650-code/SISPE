@@ -2,17 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SIGE - Portal Integral UPB</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         /* Animaciones Personalizadas */
         .fade-in-up {
@@ -31,64 +29,79 @@
         }
 
         /* Ocultar scrollbar para un diseño más limpio */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Ajustes para inputs en iOS */
+        input, textarea, select { font-size: 16px !important; }
     </style>
 </head>
-<body class="flex h-screen bg-slate-50 text-slate-800 overflow-hidden">
+<body class="flex h-screen bg-slate-50 text-slate-800 overflow-hidden relative">
 
-    <aside class="w-72 bg-[#002B49] text-white flex flex-col shadow-2xl z-50">
-        <div class="p-8">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 transition-transform hover:rotate-6">
-                    <span class="text-[#002B49] font-black text-2xl">UPB</span>
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity md:hidden"></div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out w-72 bg-[#002B49] text-white flex flex-col shadow-2xl z-50 shrink-0">
+        <div class="p-6 md:p-8 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 transition-transform hover:rotate-6">
+                    <span class="text-[#002B49] font-black text-xl md:text-2xl">UPB</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tighter leading-none">SIGE</h1>
-                    <span class="text-[10px] font-bold text-[#00B4CC] uppercase tracking-widest">Portal Integral</span>
+                    <h1 class="text-lg md:text-xl font-black tracking-tighter leading-none">SIGE</h1>
+                    <span class="text-[9px] md:text-[10px] font-bold text-[#00B4CC] uppercase tracking-widest">Portal Integral</span>
                 </div>
             </div>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 text-white/50 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
         </div>
 
-        <nav id="menu-container" class="flex-1 px-4 space-y-2 overflow-y-auto">
+        <nav id="menu-container" class="flex-1 px-4 space-y-2 overflow-y-auto pb-4">
             </nav>
 
-        <div class="p-6 mt-auto border-t border-white/10 bg-black/20">
-            <label class="block text-[9px] font-black text-white/40 uppercase mb-3 ml-2">Simular Portal</label>
+        <div class="p-5 mt-auto border-t border-white/10 bg-black/20">
+            <label class="block text-[9px] font-black text-white/40 uppercase mb-3 ml-2">Simular Rol</label>
             <div class="grid grid-cols-3 gap-2" id="role-buttons">
                 </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
+    <main class="flex-1 flex flex-col h-full overflow-hidden w-full relative">
         
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 flex items-center justify-between z-40 shrink-0 shadow-sm">
-            <div class="relative group">
-                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-[#00B4CC] transition-colors w-4 h-4"></i>
-                <input type="text" placeholder="Buscar por matrícula o módulo..." class="bg-slate-100 border-none rounded-2xl pl-12 pr-6 py-3 text-sm font-medium w-80 focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all">
+        <header class="h-16 md:h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 md:px-10 flex items-center justify-between z-30 shrink-0 shadow-sm w-full">
+            
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 -ml-2 text-slate-500 hover:text-[#002B49] transition-colors rounded-lg bg-slate-100">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                
+                <div class="relative group hidden sm:block">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-[#00B4CC] transition-colors w-4 h-4"></i>
+                    <input type="text" placeholder="Buscar..." class="bg-slate-100 border-none rounded-2xl pl-10 md:pl-12 pr-4 md:pr-6 py-2.5 md:py-3 text-xs md:text-sm font-medium w-40 md:w-80 focus:ring-2 focus:ring-[#00B4CC]/20 outline-none transition-all">
+                </div>
             </div>
 
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 md:gap-6">
                 <button class="relative p-2 text-slate-400 hover:text-[#002B49] transition-colors hover:scale-110">
-                    <i data-lucide="bell"></i>
-                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+                    <i data-lucide="bell" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    <span class="absolute top-1 right-1 md:top-1.5 md:right-1.5 w-2 md:w-2.5 h-2 md:h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
                 </button>
-                <div class="h-8 w-px bg-slate-200"></div>
-                <div class="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-all">
+                <div class="h-6 md:h-8 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-1.5 md:p-2 rounded-xl transition-all">
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-black text-slate-800 leading-none">Usuario Activo</p>
                         <p id="current-role-text" class="text-[10px] font-bold text-slate-400 capitalize">Estudiante</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
-                        <img id="profile-img" src="https://ui-avatars.com/api/?name=Estudiante&background=002B49&color=fff" alt="Perfil" />
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden shrink-0">
+                        <img id="profile-img" src="https://ui-avatars.com/api/?name=Estudiante&background=002B49&color=fff" alt="Perfil" class="w-full h-full object-cover" />
                     </div>
                 </div>
             </div>
         </header>
 
-        <div id="main-content" class="p-10 flex-1 overflow-y-auto bg-slate-50">
+        <div id="main-content" class="p-4 md:p-10 flex-1 overflow-y-auto bg-slate-50">
             </div>
     </main>
 
@@ -99,19 +112,19 @@
         const ROLES = ['estudiante', 'profesor', 'admin'];
         let currentRole = 'estudiante';
         let currentTab = 'dashboard';
+        let isSidebarOpen = false; // Estado para versión mobile
 
+        // ¡Sección de Calificaciones removida exitosamente!
         const SECCIONES = {
             estudiante: [
                 { id: 'dashboard', label: "Mi Tablero", icon: "layout-dashboard" },
                 { id: 'proyectos', label: "Mis Proyectos", icon: "folder-kanban" },
-                { id: 'calificaciones', label: "Calificaciones", icon: "award" },
                 { id: 'quejas', label: "Quejas y Sugerencias", icon: "message-circle" },
                 { id: 'elecciones', label: "República Escolar", icon: "vote" },
             ],
             profesor: [
                 { id: 'dashboard', label: "Dashboard", icon: "layout-dashboard" },
                 { id: 'proyectos', label: "Gestión de Proyectos", icon: "book-open" },
-                { id: 'calificaciones', label: "Subir Calificaciones", icon: "award" },
                 { id: 'quejas', label: "Buzón Estudiantil", icon: "message-square" },
             ],
             admin: [
@@ -123,97 +136,94 @@
         };
 
         // ==========================================
-        // 2. MÓDULOS DE VISTAS (HTML como Strings)
+        // 2. MÓDULOS DE VISTAS
         // ==========================================
 
-        // --- Módulo: Dashboard ---
         const getDashboardHTML = () => `
-            <div class="fade-in-up space-y-6">
-                <div class="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div class="fade-in-up space-y-4 md:space-y-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm">
                     <div>
-                        <h2 class="text-3xl font-black text-[#002B49]">Portal SIGE - UPB</h2>
-                        <p class="text-slate-500 font-medium italic">"Saber ser, saber hacer"</p>
+                        <h2 class="text-2xl md:text-3xl font-black text-[#002B49]">Portal SIGE</h2>
+                        <p class="text-slate-500 text-sm md:text-base font-medium italic">"Saber ser, saber hacer"</p>
                     </div>
-                    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                        <div class="w-12 h-12 bg-[#00B4CC] rounded-xl flex items-center justify-center text-white font-bold text-xl uppercase">
+                    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100 self-start sm:self-auto w-full sm:w-auto">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-[#00B4CC] rounded-xl flex items-center justify-center text-white font-bold text-lg md:text-xl uppercase shrink-0">
                             ${currentRole.charAt(0)}
                         </div>
-                        <div class="pr-2">
+                        <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase leading-none">Rol de Acceso</p>
-                            <p class="text-sm font-bold text-slate-800 capitalize">${currentRole}</p>
+                            <p class="text-sm md:text-base font-bold text-slate-800 capitalize">${currentRole}</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     <div class="bg-[#002B49] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
                         <div class="relative z-10">
                             <p class="text-xs font-bold text-[#00B4CC] uppercase tracking-widest mb-2">Proyectos Activos</p>
-                            <h3 class="text-5xl font-black tracking-tighter">124</h3>
+                            <h3 class="text-4xl md:text-5xl font-black tracking-tighter">124</h3>
                         </div>
-                        <i data-lucide="graduation-cap" class="absolute -right-4 -bottom-4 opacity-10 w-32 h-32 group-hover:scale-110 transition-transform duration-500"></i>
+                        <i data-lucide="graduation-cap" class="absolute -right-4 -bottom-4 opacity-10 w-24 h-24 md:w-32 md:h-32 group-hover:scale-110 transition-transform duration-500"></i>
                     </div>
                     <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
                         <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Notificaciones</p>
-                        <h3 class="text-5xl font-black text-slate-800 tracking-tighter">03</h3>
-                        <p class="text-xs font-bold text-amber-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Mensajes sin leer</p>
+                        <h3 class="text-4xl md:text-5xl font-black text-slate-800 tracking-tighter">03</h3>
+                        <p class="text-[10px] md:text-xs font-bold text-amber-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Mensajes sin leer</p>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-emerald-300 transition-colors">
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-emerald-300 transition-colors sm:col-span-2 lg:col-span-1">
                         <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Promedio Gral.</p>
-                        <h3 class="text-5xl font-black text-slate-800 tracking-tighter">9.2</h3>
+                        <h3 class="text-4xl md:text-5xl font-black text-slate-800 tracking-tighter">9.2</h3>
                     </div>
                 </div>
             </div>
         `;
 
-        // --- Módulo: Proyectos ---
         const getProyectosHTML = () => `
-            <div class="fade-in-up space-y-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+            <div class="fade-in-up space-y-4 md:space-y-6">
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                    <h2 class="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
                         <i data-lucide="file-plus" class="text-[#00B4CC]"></i> Registrar Nuevo Proyecto
                     </h2>
-                    <p class="text-slate-500 text-sm mt-2">Llena los datos para registrar un nuevo proyecto o protocolo.</p>
-                    <div class="mt-4 p-8 border-2 border-dashed border-slate-200 hover:border-[#00B4CC] transition-colors rounded-xl text-center text-slate-400 cursor-pointer">
-                        <i data-lucide="plus" class="mx-auto mb-2 opacity-50"></i>
-                        Clic aquí para abrir formulario de registro
+                    <p class="text-slate-500 text-xs md:text-sm mt-2">Llena los datos para registrar un nuevo proyecto o protocolo.</p>
+                    <div class="mt-4 p-6 md:p-8 border-2 border-dashed border-slate-200 hover:border-[#00B4CC] transition-colors rounded-xl text-center text-slate-400 cursor-pointer">
+                        <i data-lucide="plus" class="mx-auto mb-2 opacity-50 w-6 h-6 md:w-8 md:h-8"></i>
+                        <span class="text-sm md:text-base">Clic aquí para abrir formulario</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
                         <i data-lucide="folder-kanban" class="text-[#00B4CC]"></i> Mis Proyectos Activos
                     </h2>
-                    <div class="mt-4 bg-slate-50 rounded-xl p-4 flex items-center justify-between border border-slate-100">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-[#00B4CC]/10 p-3 rounded-lg text-[#00B4CC]"><i data-lucide="book"></i></div>
+                    <div class="mt-4 bg-slate-50 rounded-xl p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between border border-slate-100 gap-3">
+                        <div class="flex items-center gap-3 md:gap-4">
+                            <div class="bg-[#00B4CC]/10 p-2 md:p-3 rounded-lg text-[#00B4CC] shrink-0"><i data-lucide="book"></i></div>
                             <div>
-                                <h4 class="font-bold text-slate-800">Sistema Control Inventarios</h4>
-                                <p class="text-xs text-slate-500">Ingeniería Industrial</p>
+                                <h4 class="font-bold text-sm md:text-base text-slate-800">Sistema Control Inventarios</h4>
+                                <p class="text-[10px] md:text-xs text-slate-500">Ingeniería Industrial</p>
                             </div>
                         </div>
-                        <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black uppercase">En Progreso</span>
+                        <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase self-start sm:self-auto text-center">En Progreso</span>
                     </div>
                 </div>
             </div>
         `;
 
-        // --- Módulo: Quejas ---
         const getQuejasHTML = () => `
-            <div class="fade-in-up space-y-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+            <div class="fade-in-up space-y-4 md:space-y-6">
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
                         <i data-lucide="message-circle" class="text-amber-500"></i> Buzón de Atención
                     </h2>
-                    <p class="text-slate-500 text-sm mt-2">Selecciona si deseas enviar una queja, sugerencia o felicitación.</p>
+                    <p class="text-slate-500 text-xs md:text-sm mt-2">Selecciona si deseas enviar una queja, sugerencia o felicitación.</p>
                     <div class="mt-6 flex flex-col gap-4 max-w-2xl">
-                        <select class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:border-amber-400">
+                        <select class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm md:text-base text-slate-700 outline-none focus:border-amber-400">
                             <option>Tipo de mensaje...</option>
                             <option>Queja</option>
                             <option>Sugerencia</option>
                         </select>
-                        <textarea rows="4" class="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:border-amber-400 resize-none" placeholder="Escribe aquí tu mensaje..."></textarea>
-                        <button class="bg-amber-500 text-white font-bold py-3 px-6 rounded-xl self-start hover:bg-amber-600 transition-colors shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                        <textarea rows="5" class="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-sm md:text-base text-slate-700 outline-none focus:border-amber-400 resize-none" placeholder="Escribe aquí tu mensaje..."></textarea>
+                        <button class="bg-amber-500 text-white font-bold py-3 px-6 rounded-xl w-full sm:w-auto self-start hover:bg-amber-600 transition-colors shadow-md hover:shadow-lg active:scale-95">
                             Enviar Mensaje
                         </button>
                     </div>
@@ -221,58 +231,74 @@
             </div>
         `;
 
-        // --- Módulo: Elecciones ---
         const getEleccionesHTML = () => `
-            <div class="fade-in-up space-y-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                        <i data-lucide="vote" class="text-indigo-500"></i> Elecciones de República Escolar
+            <div class="fade-in-up space-y-4 md:space-y-6">
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="vote" class="text-indigo-500"></i> Elecciones Estudiantiles
                     </h2>
-                    <p class="text-slate-500 text-sm mt-2">Ejerce tu voto para elegir a tus representantes. Proceso seguro y anónimo.</p>
+                    <p class="text-slate-500 text-xs md:text-sm mt-2">Ejerce tu voto para elegir a tus representantes. Proceso seguro y anónimo.</p>
                     
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="p-8 border-2 border-slate-100 hover:border-indigo-300 bg-slate-50 rounded-2xl text-center transition-all group">
-                            <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                <i data-lucide="users" class="w-10 h-10"></i>
+                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                        <div class="p-6 md:p-8 border-2 border-slate-100 hover:border-indigo-300 bg-slate-50 rounded-2xl text-center transition-all group">
+                            <div class="w-16 h-16 md:w-20 md:h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <i data-lucide="users" class="w-8 h-8 md:w-10 md:h-10"></i>
                             </div>
-                            <h3 class="font-black text-xl text-slate-800">Planilla Azul</h3>
-                            <p class="text-xs text-slate-500 mt-2 mb-6">Presidente: Juan Pérez</p>
-                            <button class="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-md">Votar por Azul</button>
+                            <h3 class="font-black text-lg md:text-xl text-slate-800">Planilla Azul</h3>
+                            <p class="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 mb-4 md:mb-6">Presidente: Juan Pérez</p>
+                            <button class="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-md active:scale-95">Votar por Azul</button>
                         </div>
 
-                        <div class="p-8 border-2 border-slate-100 hover:border-orange-300 bg-slate-50 rounded-2xl text-center transition-all group">
-                            <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                <i data-lucide="users" class="w-10 h-10"></i>
+                        <div class="p-6 md:p-8 border-2 border-slate-100 hover:border-orange-300 bg-slate-50 rounded-2xl text-center transition-all group">
+                            <div class="w-16 h-16 md:w-20 md:h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <i data-lucide="users" class="w-8 h-8 md:w-10 md:h-10"></i>
                             </div>
-                            <h3 class="font-black text-xl text-slate-800">Planilla Naranja</h3>
-                            <p class="text-xs text-slate-500 mt-2 mb-6">Presidenta: Ana Gómez</p>
-                            <button class="w-full py-3 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md">Votar por Naranja</button>
+                            <h3 class="font-black text-lg md:text-xl text-slate-800">Planilla Naranja</h3>
+                            <p class="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 mb-4 md:mb-6">Presidenta: Ana Gómez</p>
+                            <button class="w-full py-3 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md active:scale-95">Votar por Naranja</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
 
-        // --- Módulo: En Desarrollo (Genérico) ---
         const getEnDesarrolloHTML = () => `
-            <div class="fade-in-up flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
-                <div class="p-6 bg-slate-50 rounded-full mb-6">
-                    <i data-lucide="database" class="w-16 h-16 text-slate-300"></i>
+            <div class="fade-in-up flex flex-col items-center justify-center py-16 md:py-24 px-4 text-center bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-slate-200">
+                <div class="p-4 md:p-6 bg-slate-50 rounded-full mb-4 md:mb-6">
+                    <i data-lucide="database" class="w-10 h-10 md:w-16 md:h-16 text-slate-300"></i>
                 </div>
-                <h3 class="text-2xl font-black text-slate-400 uppercase tracking-tighter">Módulo en Desarrollo</h3>
-                <p class="text-slate-500 font-medium mt-2">Esta sección se está diseñando actualmente.</p>
+                <h3 class="text-xl md:text-2xl font-black text-slate-400 uppercase tracking-tighter">Módulo en Desarrollo</h3>
+                <p class="text-slate-500 text-sm md:text-base font-medium mt-2">Esta sección se está diseñando actualmente.</p>
             </div>
         `;
 
         // ==========================================
-        // 3. CONTROLADOR DE LA INTERFAZ
+        // 3. CONTROLADORES Y LÓGICA
         // ==========================================
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            isSidebarOpen = !isSidebarOpen;
+            
+            if (isSidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                // Prevenir scroll en el body cuando el menú está abierto en móvil
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
 
         function renderMenu() {
             const menuContainer = document.getElementById('menu-container');
             const items = SECCIONES[currentRole];
             
-            menuContainer.innerHTML = '<p class="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">Navegación</p>';
+            menuContainer.innerHTML = '<p class="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-3 mt-2">Navegación</p>';
             
             items.forEach(item => {
                 const isActive = currentTab === item.id;
@@ -280,15 +306,14 @@
                 const dot = isActive ? '<div class="ml-auto w-1.5 h-1.5 bg-[#00B4CC] rounded-full shadow-[0_0_8px_#00B4CC]"></div>' : '';
                 
                 menuContainer.innerHTML += `
-                    <button onclick="changeTab('${item.id}')" class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 ${activeClass}">
-                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
-                        <span class="font-bold text-sm tracking-tight">${item.label}</span>
+                    <button onclick="changeTab('${item.id}')" class="w-full flex items-center gap-3 md:gap-4 px-4 py-3 md:py-4 rounded-2xl transition-all duration-300 ${activeClass}">
+                        <i data-lucide="${item.icon}" class="w-4 h-4 md:w-5 md:h-5"></i>
+                        <span class="font-bold text-xs md:text-sm tracking-tight truncate">${item.label}</span>
                         ${dot}
                     </button>
                 `;
             });
             
-            // Refrescar iconos en el menú
             lucide.createIcons();
         }
 
@@ -301,7 +326,7 @@
                 const activeClass = isActive ? 'border-[#00B4CC] text-[#00B4CC] bg-[#00B4CC]/10' : 'border-white/10 text-white/40 hover:bg-white/5';
                 
                 container.innerHTML += `
-                    <button onclick="changeRole('${r}')" class="py-2 text-[8px] font-black rounded-lg border uppercase transition-all ${activeClass}">
+                    <button onclick="changeRole('${r}')" class="py-2 px-1 text-[8px] font-black rounded-lg border uppercase transition-all truncate ${activeClass}">
                         ${r}
                     </button>
                 `;
@@ -311,7 +336,6 @@
         function renderContent() {
             const container = document.getElementById('main-content');
             
-            // Switch principal de vistas
             switch(currentTab) {
                 case 'dashboard': container.innerHTML = getDashboardHTML(); break;
                 case 'proyectos': container.innerHTML = getProyectosHTML(); break;
@@ -320,7 +344,6 @@
                 default: container.innerHTML = getEnDesarrolloHTML(); break;
             }
             
-            // Refrescar iconos en el contenido principal
             lucide.createIcons();
         }
 
@@ -332,19 +355,27 @@
             currentTab = tabId;
             renderMenu();
             renderContent();
+            
+            // Cerrar menú automáticamente en móviles al seleccionar una opción
+            if (window.innerWidth < 768 && isSidebarOpen) {
+                toggleSidebar();
+            }
         }
 
         function changeRole(role) {
             currentRole = role;
-            currentTab = 'dashboard'; // Resetear a dashboard al cambiar rol
+            currentTab = 'dashboard';
             
-            // Actualizar textos del header
             document.getElementById('current-role-text').innerText = role;
             document.getElementById('profile-img').src = `https://ui-avatars.com/api/?name=${role}&background=002B49&color=fff`;
             
             renderRoleButtons();
             renderMenu();
             renderContent();
+            
+            if (window.innerWidth < 768 && isSidebarOpen) {
+                toggleSidebar();
+            }
         }
 
         // Inicializar la app
@@ -352,8 +383,10 @@
             renderRoleButtons();
             renderMenu();
             renderContent();
+            
+            // Asegurarnos de que los íconos se rendericen bien la primera vez
+            setTimeout(() => lucide.createIcons(), 100);
         };
-
     </script>
 </body>
 </html>
